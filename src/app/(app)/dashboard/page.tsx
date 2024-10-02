@@ -163,6 +163,7 @@ const dashboard = () => {
 
   const [items, setItems] = useState([]);
 
+  // Fetch items function
   const itemsfetch = useCallback(async () => {
     try {
       const response = await axios.get(`/api/yash/get-items`);
@@ -174,7 +175,7 @@ const dashboard = () => {
 
   useEffect(() => {
     if (session && session.user) {
-      itemsfetch();
+      itemsfetch(); // Fetch the items when the session exists
     }
   }, [session, itemsfetch]);
 
@@ -215,6 +216,7 @@ const dashboard = () => {
     },
   });
 
+  // On submit function with refresh logic
   const onSubmit = async (data: {
     itemName: string;
     itemValue: string;
@@ -222,11 +224,17 @@ const dashboard = () => {
     category: string;
   }) => {
     try {
+      // Submit new item to the server
       const response = await axios.post<{ success: string; message: string }>(
         `/api/${user}/add-item`,
         data
       );
-    } catch (error) {}
+
+      // Refresh the table data by fetching updated items
+      await itemsfetch();
+    } catch (error) {
+      console.error("Error adding item:", error);
+    }
   };
 
   return (
@@ -248,7 +256,6 @@ const dashboard = () => {
                         {...field}
                         onChange={(e) => {
                           field.onChange(e);
-                          // debounced(e.target.value);
                         }}
                       />
                     </FormControl>
